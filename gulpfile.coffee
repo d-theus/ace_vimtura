@@ -12,6 +12,7 @@ NODE_ENV='development'
 gulp.task 'compile', ->
   gulp.src([
     'javascripts/ace/ace.js'
+    'javascripts/ace/vim.js'
     'javascripts/ace_vimtura.coffee'])
     .pipe(include())
     .pipe(
