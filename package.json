@@ -1,0 +1,28 @@
+{
+  "name": "ace_vimtura",
+  "description": "Ace-based javascript text editor with Vim keybindings and live preview, several markups supported.",
+  "version": "0.0.1",
+  "keywords": [
+    "vim",
+    "ace",
+    "editor",
+    "text-editor"
+  ],
+  "author": "D-Theus",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/d-theus/ace_vimtura"
+  },
+  "devDependencies":{
+    "gulp": "",
+    "coffee-script": "",
+    "coffee-gulp": "",
+    "gulp-coffee": "",
+    "gulp-include": "",
+    "gulp-concat": "",
+    "gulp-less": "",
+    "gulp-uglify": "",
+    "gulp-if": "",
+    "gulp-rename": ""
+  }
+}
