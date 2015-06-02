@@ -1,6 +1,6 @@
 AceVimtura.Utils = {}
 
-AceVimtura.Utils.getfile = (name, done)->
+AceVimtura.Utils.getjs = (name, done)->
   script = document.createElement('script')
   script.src = name
   script.type = 'application/javascript'
