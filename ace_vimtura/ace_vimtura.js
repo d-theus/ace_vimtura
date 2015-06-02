@@ -37,6 +37,17 @@ AceVimtura.Utils.getjs = function(name, done) {
   return document.head.appendChild(script);
 };
 
+AceVimtura.Utils.getcss = function(name, done) {
+  var link;
+  link = document.createElement('link');
+  link.href = name;
+  link.type = 'text/css';
+  link.async = true;
+  link.rel = 'stylesheet';
+  link.onload = done;
+  return document.head.appendChild(link);
+};
+
 AceVimtura.Preview = (function() {
   function Preview() {
     this.toggle = bind(this.toggle, this);
@@ -45,13 +56,7 @@ AceVimtura.Preview = (function() {
     this.html = bind(this.html, this);
     this.update = bind(this.update, this);
     this.dom = document.createElement('div');
-    this.dom.classList.add('preview');
-    this.dom.style.width = '48%';
-    this.dom.style.height = '100%';
-    this.dom.style.background = '#ddd';
-    this.dom.style.display = 'inline-block';
-    this.dom.style['overflow-x'] = 'hidden';
-    this.dom.style['overflow-y'] = 'scroll';
+    this.dom.classList.add('av_preview');
     this.timeout = null;
     this.isEnabled = false;
     AceVimtura.dom.appendChild(this.dom);
@@ -90,7 +95,7 @@ AceVimtura.Preview = (function() {
     }
     this.update();
     AceVimtura.ace.on('change', this.update);
-    return this.dom.style.display = 'inline-block';
+    return this.dom.classList.remove('collapsed');
   };
 
   Preview.prototype.disable = function() {
@@ -105,7 +110,7 @@ AceVimtura.Preview = (function() {
       return;
     }
     reg['change'].splice(i, 1);
-    return this.dom.style.display = 'none';
+    return this.dom.classList.add('collapsed');
   };
 
   Preview.prototype.toggle = function() {
@@ -124,13 +129,11 @@ AceVimtura.Views.Mappings = '<h2>Supported key bindings</h2> <h3>Motion:</h3> <p
 
 AceVimtura.init = function(id) {
   var div;
+  this.Utils.getcss('ace_vimtura/ace_vimtura.css');
   this.dom = document.getElementById(id);
   div = document.createElement('div');
-  div.classList.add('editor');
+  div.classList.add('av_editor');
   div.id = id + "_ace";
-  div.style.width = '48%';
-  div.style.height = '100%';
-  div.style.display = 'inline-block';
   this.dom.appendChild(div);
   this.ace = ace.edit(div.id);
   this.ace.dom = div;
@@ -161,13 +164,13 @@ AceVimtura.setRenderer = function(name) {
 };
 
 AceVimtura.goSplit = function() {
-  this.ace.dom.style.width = '48%';
+  this.ace.dom.classList.remove('fullscreen');
   this.preview.enable();
   return this.isSplit = true;
 };
 
 AceVimtura.goFullscreen = function() {
-  this.ace.dom.style.width = '100%';
+  this.ace.dom.classList.add('fullscreen');
   this.preview.disable();
   return this.isSplit = false;
 };

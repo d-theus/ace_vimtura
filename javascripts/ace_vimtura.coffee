@@ -13,13 +13,11 @@ AceVimtura.Views = {}
 #=require 'views/mappings.coffee'
 
 AceVimtura.init = (id)->
+  this.Utils.getcss('ace_vimtura/ace_vimtura.css')
   @dom = document.getElementById(id)
   div = document.createElement('div')
-  div.classList.add('editor')
+  div.classList.add('av_editor')
   div.id = "#{id}_ace"
-  div.style.width = '48%'
-  div.style.height = '100%'
-  div.style.display = 'inline-block'
   @dom.appendChild(div)
   @ace = ace.edit(div.id)
   @ace.dom = div
@@ -41,12 +39,12 @@ AceVimtura.setRenderer = (name)->
     @renderer = new AceVimtura.Renderers[name.charAt(0).toUpperCase() + name.slice(1)]
 
 AceVimtura.goSplit = ->
-  @ace.dom.style.width = '48%'
+  @ace.dom.classList.remove('fullscreen')
   @preview.enable()
   @isSplit = true
 
 AceVimtura.goFullscreen = ->
-  @ace.dom.style.width = '100%'
+  @ace.dom.classList.add('fullscreen')
   @preview.disable()
   @isSplit = false
 

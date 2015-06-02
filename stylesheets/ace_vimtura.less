@@ -1,0 +1,29 @@
+.av_editor{
+  display: inline-block;
+  width: 48%;
+  min-height: 500px;
+  height: 100%;
+
+  &.fullscreen{
+    width: 100%;
+  }
+
+  transition: width 1s;
+  -webkit-transition: width 1s;
+}
+
+.av_preview{
+  display: inline-block;
+  width: 48%;
+  min-height: 500px;
+  height: 100%;
+  background: #eee;
+  overflow-x: hidden;
+  overflow-y: scroll;
+
+  &.collapsed{
+    width: 0;
+  }
+  transition: width 1s;
+  -webkit-transition: width 1s;
+}

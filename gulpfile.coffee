@@ -6,6 +6,7 @@ uglify = require('gulp-uglify')
 concat = require('gulp-concat')
 rename = require('gulp-rename')
 gulpif = require('gulp-if')
+less = require('gulp-less')
 
 NODE_ENV='development'
 
@@ -30,5 +31,9 @@ gulp.task 'compile', ->
         gulpif(/[.]coffee$/, coffee( bare: true )))
       .pipe(concat "#{name}.js")
       .pipe(gulp.dest 'ace_vimtura/renderers')
+  gulp.src('stylesheets/**/*.less')
+    .pipe(less())
+    .pipe(concat 'ace_vimtura.css')
+    .pipe(gulp.dest('ace_vimtura'))
 
 gulp.task 'default', ['compile']
