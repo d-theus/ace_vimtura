@@ -36,10 +36,18 @@ AceVimtura.init = (id, options = {})->
 AceVimtura.setTheme = (name)->
   this.Utils.getjs "ace_vimtura/ace/theme-#{name}.js", =>
     @ace.setTheme("ace/theme/#{name}")
+    @themeName = name
+
+AceVimtura.getTheme = ->
+  @themeName
 
 AceVimtura.setRenderer = (name)->
   this.Utils.getjs "ace_vimtura/renderers/#{name}.js", =>
     @renderer = new AceVimtura.Renderers[name.charAt(0).toUpperCase() + name.slice(1)]
+    @rendererName = name
+
+AceVimtura.getRenderer = ->
+  @rendererName
 
 AceVimtura.goSplit = ->
   @ace.dom.classList.remove('fullscreen')
@@ -50,7 +58,6 @@ AceVimtura.goFullscreen = ->
   @ace.dom.classList.add('fullscreen')
   @preview.disable()
   @isSplit = false
-
 
 AceVimtura.toggleSplit = ->
   if @isSplit
@@ -83,12 +90,20 @@ AceVimtura.showMappings = ->
       this.Views.Mappings
     )
 
-AceVimtura._defineCommands = ->
-  @vimapi.defineEx 'colorscheme', 'colo', (cm, params)=>
-    throw 'Specify colorscheme name' unless params.args
-    name = params.args[0]
-    this.setTheme(params.args[0])
+AceVimtura.setVariable = (variable, value)->
+  methBase = variable.charAt(0).toUpperCase()+variable.slice(1)
+  if value
+    if this['set' + methBase]
+      this['set' + methBase](value)
+    else
+      throw "No such variable: #{variable}"
+  else
+    if this['get' + methBase]
+      throw this['get' + methBase]()
+    else
+      throw "No such variable: #{variable}"
 
+AceVimtura._defineCommands = ->
   @vimapi.defineEx 'preview', 'pre', ()=>
     this.toggleSplit()
 
@@ -106,3 +121,10 @@ AceVimtura._defineCommands = ->
 
   @vimapi.defineEx 'help', 'h', ()=>
     this.showHelp()
+
+  @vimapi.defineEx 'set', 'se', (cm, params)=>
+    throw 'Specify variable name' unless params.args && params.args[0]
+    this.setVariable(
+      params.args[0]
+      params.args[1]
+    )

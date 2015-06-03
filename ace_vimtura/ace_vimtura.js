@@ -135,7 +135,7 @@ AceVimtura.Preview = (function() {
 
 })();
 
-AceVimtura.Views.Help = '<h2>Ace Vimtura</h2> <h3>Index</h3> <h3></h3> <h3>Mappings</h3> <p>Type in <code>:map</code> to see mappings. <h3>Commands</h3> <p> <code>:help</code> show this text </p> <p> <code>:pre</code> toggle preview mode </p> <p> <code>:map</code> see key mappings </p> <p> <code>:w</code> or <code>:write</code> save current text to your browser </p> <p> <code>:q</code> or <code>:quit</code> close preview and also disable rendering </p>';
+AceVimtura.Views.Help = '<h2>Ace Vimtura</h2> <h3>Index</h3> <h3>Mappings</h3> <p>Type in <code>:map</code> to see mappings. <h3>Commands</h3> <p> <code>:help</code> show this text </p> <p> <code>:pre</code> toggle preview mode </p> <p> <code>:map</code> see key mappings </p> <p> <code>:w</code> or <code>:write</code> save current text to your browser </p> <p> <code>:q</code> or <code>:quit</code> close preview and also disable rendering </p> <p> <code>:set</code> or <code>:se</code> sets variable if value given, shows current value otherwise <h3>Variables</h3> <p>theme</p> <p>renderer <small>renderer only</small></p> <p>filetype <small>changes both renderer and syntax hightlighter</small></p>';
 
 AceVimtura.Views.Mappings = '<h2>Supported key bindings</h2> <h3>Motion:</h3> <p>h, j, k, l</p> <p> gj, gk </p> <p> e, E, w, W, b, B, ge, gE </p> <p>f&lt;character&gt;, F&lt;character&gt;, t&lt;character&gt;, T&lt;character&gt; </p> <p> $, ^, 0, -, +, _ </p> <p> gg, G </p> <p> % </p> <p> \'&lt;character&gt;, `&lt;character&gt; </p> <h3>Operator:</h3> <p> d, y, c </p> <p> dd, yy, cc </p> <p> g~, g~g~ </p> <p> &gt;, &lt;, &gt;&gt;, &lt;&lt; </p> <h3> Operator-Motion: </h3> <p> x, X, D, Y, C, ~ </p> <h3> Action: </h3> <p> a, i, s, A, I, S, o, O </p> <p> zz, z., z&lt;CR&gt;, zt, zb, z- </p> <p> J </p> <p> u, Ctrl-r </p> <p> m&lt;character&gt; </p> <p> r&lt;character&gt; </p> <h3> Modes: </h3> <p> ESC - leave insert mode, visual mode, and clear input state. </p> <p> Ctrl-[, Ctrl-c - same as ESC. </p>';
 
@@ -171,17 +171,27 @@ AceVimtura.init = function(id, options) {
 AceVimtura.setTheme = function(name) {
   return this.Utils.getjs("ace_vimtura/ace/theme-" + name + ".js", (function(_this) {
     return function() {
-      return _this.ace.setTheme("ace/theme/" + name);
+      _this.ace.setTheme("ace/theme/" + name);
+      return _this.themeName = name;
     };
   })(this));
+};
+
+AceVimtura.getTheme = function() {
+  return this.themeName;
 };
 
 AceVimtura.setRenderer = function(name) {
   return this.Utils.getjs("ace_vimtura/renderers/" + name + ".js", (function(_this) {
     return function() {
-      return _this.renderer = new AceVimtura.Renderers[name.charAt(0).toUpperCase() + name.slice(1)];
+      _this.renderer = new AceVimtura.Renderers[name.charAt(0).toUpperCase() + name.slice(1)];
+      return _this.rendererName = name;
     };
   })(this));
+};
+
+AceVimtura.getRenderer = function() {
+  return this.rendererName;
 };
 
 AceVimtura.goSplit = function() {
@@ -232,17 +242,25 @@ AceVimtura.showMappings = function() {
   return this.preview.html(this.Views.Mappings);
 };
 
+AceVimtura.setVariable = function(variable, value) {
+  var methBase;
+  methBase = variable.charAt(0).toUpperCase() + variable.slice(1);
+  if (value) {
+    if (this['set' + methBase]) {
+      return this['set' + methBase](value);
+    } else {
+      throw "No such variable: " + variable;
+    }
+  } else {
+    if (this['get' + methBase]) {
+      throw this['get' + methBase]();
+    } else {
+      throw "No such variable: " + variable;
+    }
+  }
+};
+
 AceVimtura._defineCommands = function() {
-  this.vimapi.defineEx('colorscheme', 'colo', (function(_this) {
-    return function(cm, params) {
-      var name;
-      if (!params.args) {
-        throw 'Specify colorscheme name';
-      }
-      name = params.args[0];
-      return _this.setTheme(params.args[0]);
-    };
-  })(this));
   this.vimapi.defineEx('preview', 'pre', (function(_this) {
     return function() {
       return _this.toggleSplit();
@@ -269,9 +287,17 @@ AceVimtura._defineCommands = function() {
       return _this.goFullscreen();
     };
   })(this));
-  return this.vimapi.defineEx('help', 'h', (function(_this) {
+  this.vimapi.defineEx('help', 'h', (function(_this) {
     return function() {
       return _this.showHelp();
+    };
+  })(this));
+  return this.vimapi.defineEx('set', 'se', (function(_this) {
+    return function(cm, params) {
+      if (!(params.args && params.args[0])) {
+        throw 'Specify variable name';
+      }
+      return _this.setVariable(params.args[0], params.args[1]);
     };
   })(this));
 };
