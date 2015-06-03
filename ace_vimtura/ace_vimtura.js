@@ -185,6 +185,7 @@ AceVimtura.setRenderer = function(name) {
   return this.Utils.getjs("ace_vimtura/renderers/" + name + ".js", (function(_this) {
     return function() {
       _this.renderer = new AceVimtura.Renderers[name.charAt(0).toUpperCase() + name.slice(1)];
+      _this.preview.instantUpdate();
       return _this.rendererName = name;
     };
   })(this));
@@ -192,6 +193,31 @@ AceVimtura.setRenderer = function(name) {
 
 AceVimtura.getRenderer = function() {
   return this.rendererName;
+};
+
+AceVimtura.setMode = function(name) {
+  this.Utils.getjs("ace_vimtura/ace/mode-" + name + ".js", (function(_this) {
+    return function() {
+      var mode;
+      mode = ace.require("ace/mode/" + name).Mode;
+      return _this.ace.session.setMode(new mode);
+    };
+  })(this));
+  return this.modeName = name;
+};
+
+AceVimtura.getMode = function() {
+  return this.modeName;
+};
+
+AceVimtura.setFiletype = function(name) {
+  this.setRenderer(name);
+  this.setMode(name);
+  return this.filetypeName = name;
+};
+
+AceVimtura.getFiletype = function() {
+  return this.filetypeName;
 };
 
 AceVimtura.goSplit = function() {

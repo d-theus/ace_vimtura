@@ -44,10 +44,28 @@ AceVimtura.getTheme = ->
 AceVimtura.setRenderer = (name)->
   this.Utils.getjs "ace_vimtura/renderers/#{name}.js", =>
     @renderer = new AceVimtura.Renderers[name.charAt(0).toUpperCase() + name.slice(1)]
+    @preview.instantUpdate()
     @rendererName = name
 
 AceVimtura.getRenderer = ->
   @rendererName
+
+AceVimtura.setMode = (name)->
+  this.Utils.getjs "ace_vimtura/ace/mode-#{name}.js", =>
+    mode = ace.require("ace/mode/#{name}").Mode
+    @ace.session.setMode(new mode)
+  @modeName = name
+
+AceVimtura.getMode = ->
+  @modeName
+
+AceVimtura.setFiletype = (name)->
+  this.setRenderer(name)
+  this.setMode(name)
+  @filetypeName = name
+
+AceVimtura.getFiletype = ->
+  @filetypeName
 
 AceVimtura.goSplit = ->
   @ace.dom.classList.remove('fullscreen')
