@@ -18,7 +18,8 @@ AceVimtura = {};
 AceVimtura.options = {
   refreshTimeout: 500,
   theme: 'twilight',
-  renderer: 'markdown'
+  renderer: 'markdown',
+  autoFocus: true
 };
 
 AceVimtura.Renderers = {};
@@ -54,6 +55,7 @@ AceVimtura.Preview = (function() {
     this.disable = bind(this.disable, this);
     this.enable = bind(this.enable, this);
     this.html = bind(this.html, this);
+    this.instantUpdate = bind(this.instantUpdate, this);
     this.update = bind(this.update, this);
     this.dom = document.createElement('div');
     this.dom.classList.add('av_preview');
@@ -69,10 +71,18 @@ AceVimtura.Preview = (function() {
     }
     return this.timeout = window.setTimeout((function(_this) {
       return function() {
-        _this.html(AceVimtura.renderer.render(AceVimtura.ace.getValue()));
+        _this.instantUpdate();
         return _this.timeout = null;
       };
     })(this), AceVimtura.options.refreshTimeout);
+  };
+
+  Preview.prototype.instantUpdate = function() {
+    var rend;
+    if (!(rend = AceVimtura.renderer)) {
+      return;
+    }
+    return this.html(rend.render(AceVimtura.ace.getValue()));
   };
 
   Preview.prototype.html = function(text) {
@@ -93,7 +103,7 @@ AceVimtura.Preview = (function() {
     if (reg['change'].indexOf(this.update) > -1) {
       return;
     }
-    this.update();
+    this.instantUpdate();
     AceVimtura.ace.on('change', this.update);
     return this.dom.classList.remove('collapsed');
   };
@@ -125,11 +135,20 @@ AceVimtura.Preview = (function() {
 
 })();
 
+AceVimtura.Views.Help = '<h2>Ace Vimtura</h2> <h3>Index</h3> <h3></h3> <h3>Mappings</h3> <p>Type in <code>:map</code> to see mappings. <h3>Commands</h3> <p> <code>:help</code> show this text </p> <p> <code>:pre</code> toggle preview mode </p> <p> <code>:map</code> see key mappings </p> <p> <code>:w</code> or <code>:write</code> save current text to your browser </p> <p> <code>:q</code> or <code>:quit</code> close preview and also disable rendering </p>';
+
 AceVimtura.Views.Mappings = '<h2>Supported key bindings</h2> <h3>Motion:</h3> <p>h, j, k, l</p> <p> gj, gk </p> <p> e, E, w, W, b, B, ge, gE </p> <p>f&lt;character&gt;, F&lt;character&gt;, t&lt;character&gt;, T&lt;character&gt; </p> <p> $, ^, 0, -, +, _ </p> <p> gg, G </p> <p> % </p> <p> \'&lt;character&gt;, `&lt;character&gt; </p> <h3>Operator:</h3> <p> d, y, c </p> <p> dd, yy, cc </p> <p> g~, g~g~ </p> <p> &gt;, &lt;, &gt;&gt;, &lt;&lt; </p> <h3> Operator-Motion: </h3> <p> x, X, D, Y, C, ~ </p> <h3> Action: </h3> <p> a, i, s, A, I, S, o, O </p> <p> zz, z., z&lt;CR&gt;, zt, zb, z- </p> <p> J </p> <p> u, Ctrl-r </p> <p> m&lt;character&gt; </p> <p> r&lt;character&gt; </p> <h3> Modes: </h3> <p> ESC - leave insert mode, visual mode, and clear input state. </p> <p> Ctrl-[, Ctrl-c - same as ESC. </p>';
 
-AceVimtura.init = function(id) {
-  var div;
+AceVimtura.init = function(id, options) {
+  var div, j, key, len;
+  if (options == null) {
+    options = {};
+  }
   this.Utils.getcss('ace_vimtura/ace_vimtura.css');
+  for (j = 0, len = options.length; j < len; j++) {
+    key = options[j];
+    this.options[key] = options.key;
+  }
   this.dom = document.getElementById(id);
   div = document.createElement('div');
   div.classList.add('av_editor');
@@ -139,12 +158,14 @@ AceVimtura.init = function(id) {
   this.ace.dom = div;
   this.ace.setKeyboardHandler('ace/keyboard/vim');
   this.vimapi = ace.require('ace/keyboard/vim').CodeMirror.Vim;
-  this.isSplit = true;
   this.setRenderer(AceVimtura.options.renderer);
   this.preview = new AceVimtura.Preview;
   this.setTheme(AceVimtura.options.theme);
   this._defineCommands();
-  return this.load();
+  this.load() || this.showHelp();
+  if (options.autoFocus) {
+    return this.ace.focus();
+  }
 };
 
 AceVimtura.setTheme = function(name) {
@@ -194,7 +215,21 @@ AceVimtura.load = function() {
   ls = window.localStorage;
   if (data = ls.ace_vimtura_file) {
     return this.ace.setValue(data);
+  } else {
+    return false;
   }
+};
+
+AceVimtura.showHelp = function() {
+  this.save();
+  this.goSplit();
+  return this.preview.html(this.Views.Help);
+};
+
+AceVimtura.showMappings = function() {
+  this.save();
+  this.goSplit();
+  return this.preview.html(this.Views.Mappings);
 };
 
 AceVimtura._defineCommands = function() {
@@ -226,14 +261,17 @@ AceVimtura._defineCommands = function() {
   })(this));
   this.vimapi.defineEx('map', 'm', (function(_this) {
     return function() {
-      _this.save();
-      AceVimtura.goSplit();
-      return AceVimtura.preview.html(AceVimtura.Views.Mappings);
+      return _this.showMappings();
     };
   })(this));
-  return this.vimapi.defineEx('quit', 'q', (function(_this) {
+  this.vimapi.defineEx('quit', 'q', (function(_this) {
     return function() {
-      return AceVimtura.goFullscreen();
+      return _this.goFullscreen();
+    };
+  })(this));
+  return this.vimapi.defineEx('help', 'h', (function(_this) {
+    return function() {
+      return _this.showHelp();
     };
   })(this));
 };

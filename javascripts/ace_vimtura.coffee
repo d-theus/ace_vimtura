@@ -4,16 +4,19 @@ AceVimtura.options =
   refreshTimeout: 500
   theme:          'twilight'
   renderer:       'markdown'
+  autoFocus:      true
 
 AceVimtura.Renderers = {}
 AceVimtura.Views = {}
 
 #=require 'getfile.coffee'
 #=require 'preview.coffee'
-#=require 'views/mappings.coffee'
+#=require_tree 'views'
 
-AceVimtura.init = (id)->
+AceVimtura.init = (id, options = {})->
   this.Utils.getcss('ace_vimtura/ace_vimtura.css')
+  for key in options
+    this.options[key] = options.key
   @dom = document.getElementById(id)
   div = document.createElement('div')
   div.classList.add('av_editor')
@@ -23,12 +26,12 @@ AceVimtura.init = (id)->
   @ace.dom = div
   @ace.setKeyboardHandler('ace/keyboard/vim')
   @vimapi = ace.require('ace/keyboard/vim').CodeMirror.Vim
-  @isSplit = true
   this.setRenderer AceVimtura.options.renderer
   this.preview = new AceVimtura.Preview
   this.setTheme AceVimtura.options.theme
   this._defineCommands()
-  this.load()
+  this.load() || this.showHelp()
+  this.ace.focus() if options.autoFocus
 
 AceVimtura.setTheme = (name)->
   this.Utils.getjs "ace_vimtura/ace/theme-#{name}.js", =>
@@ -63,6 +66,22 @@ AceVimtura.load = ->
   ls = window.localStorage
   if data = ls.ace_vimtura_file
     @ace.setValue(data)
+  else
+    false
+
+AceVimtura.showHelp = ->
+    this.save()
+    this.goSplit()
+    this.preview.html(
+      this.Views.Help
+    )
+
+AceVimtura.showMappings = ->
+    this.save()
+    this.goSplit()
+    this.preview.html(
+      this.Views.Mappings
+    )
 
 AceVimtura._defineCommands = ->
   @vimapi.defineEx 'colorscheme', 'colo', (cm, params)=>
@@ -80,11 +99,10 @@ AceVimtura._defineCommands = ->
     this.save()
 
   @vimapi.defineEx 'map', 'm', ()=>
-    this.save()
-    AceVimtura.goSplit()
-    AceVimtura.preview.html(
-      AceVimtura.Views.Mappings
-    )
+    this.showMappings()
 
   @vimapi.defineEx 'quit', 'q', ()=>
-    AceVimtura.goFullscreen()
+    this.goFullscreen()
+
+  @vimapi.defineEx 'help', 'h', ()=>
+    this.showHelp()

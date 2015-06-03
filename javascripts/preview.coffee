@@ -10,13 +10,17 @@ class AceVimtura.Preview
   update: =>
       window.clearTimeout(@timeout) if @timeout
       @timeout = window.setTimeout(=>
-        this.html(
-          AceVimtura.renderer.render(
-            AceVimtura.ace.getValue()
-          )
-        )
+        this.instantUpdate()
         @timeout = null
       , AceVimtura.options.refreshTimeout)
+
+  instantUpdate: =>
+    return unless rend = AceVimtura.renderer
+    this.html(
+      rend.render(
+        AceVimtura.ace.getValue()
+      )
+    )
 
   html: (text)=>
     if text
@@ -29,7 +33,7 @@ class AceVimtura.Preview
     reg = AceVimtura.ace._eventRegistry
     return unless reg['change']
     return if reg['change'].indexOf(this.update) > -1
-    this.update()
+    this.instantUpdate()
     AceVimtura.ace.on 'change', this.update
     @dom.classList.remove('collapsed')
 
