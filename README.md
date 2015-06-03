@@ -21,21 +21,6 @@ I took same approach as Vi or Vim: minimum mouse usage for faster workflow.
 * Autocompletion
 * Emmet\Zencoding plugin
 
-## Requirements
-
-### For basic usage
-
-Should work right out of the box
-
-### For enhanced experience
-
-#### Bundling custom theme and mode to minify
-
-* node
-* npm
-* gulp
-* Also see `package.json`
-
 ## Installation
 
 Copy `ace_vimtura` folder to your javascripts folder.
@@ -43,6 +28,8 @@ Copy `ace_vimtura` folder to your javascripts folder.
 ## Usage
 
 ### Basics
+
+#### Code
 
 ```html
 <script src="ace_vimtura/ace_vimtura.js" type="text/javascript" charset="utf-8"></script>
@@ -55,24 +42,23 @@ AceVimtura.init('editor')
 AceVimtura.setTheme('twilight')
 ```
 
-### Getting help
+#### Commands and getting help
 
-#### map
+There is no buttons in here. Just command line. Now you
+should be already familiar with concept of modes in Vim.
+Like in Vim, to enter command set normal mode and hit `:`.
+There will appear little console at the bottom. Type in commands
+here and hit enter. Try `:help` first.
+
+##### map
 Go to normal mode and enter command `:map` and hit enter to
 see key bindings from Vim defaults. See [Vim reference](http://vimdoc.sourceforge.net/htmldoc/usr_toc.html).
 
-#### help
+##### help
 
 `:help` command will display basic instructions and command list.
 
 ## Customize
-
-### Optimizing requests
-
-Requiring themes happens by GET request on demand.
-
-To decrease requests number you can concat `ace_vimtura/ace_vimtura.js` with any of `ace_vimtura/ace/theme-*.js`, `ace_vimtura/vim/ext-*.js` and
-   `ace_vimtura/ace/mode-*.js`.
 
 ### Adding custom commands
 
