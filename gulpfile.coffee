@@ -25,10 +25,14 @@ gulp.task 'compile', ->
   )
   for name in renderers
     gulp.src([
-      "javascripts/renderers/vendor-#{name}.js"
-      "javascripts/renderers/#{name}.coffee" ])
+      "javascripts/renderers/#{name}.coffee"
+      "javascripts/renderers/#{name}-vendor.js"
+    ])
+      .pipe(include())
       .pipe(
-        gulpif(/[.]coffee$/, coffee( bare: true )))
+        gulpif(
+          /[.]coffee$/
+          coffee( bare: true)))
       .pipe(concat "#{name}.js")
       .pipe(gulp.dest 'ace_vimtura/renderers')
   gulp.src('stylesheets/**/*.less')

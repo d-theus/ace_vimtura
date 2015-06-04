@@ -1,3 +1,3 @@
 class AceVimtura.Renderers.Haml
   constructor: (options = {})->
-    return window.Haml
+    return AceVimtura.Renderers.Vendor.haml

@@ -1,6 +1,6 @@
 class AceVimtura.Renderers.Markdown
   constructor: (options = {})->
-    @marked = marked
+    @marked = AceVimtura.Renderers.Vendor.marked
     options.gfm ||= true
     options.tables ||= true
     options.breaks ||= false
