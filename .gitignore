@@ -2,5 +2,5 @@ node_modules/
 bower_components/
 *.log
 
-build/
+ace_vimtura/
 index.html

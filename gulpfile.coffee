@@ -12,8 +12,8 @@ NODE_ENV='development'
 
 gulp.task 'compile', ->
   gulp.src([
-    'javascripts/ace/ace.js'
-    'javascripts/ace/vim.js'
+    'lib/ace/ace.js'
+    'lib/ace/vim.js'
     'javascripts/ace_vimtura.coffee'])
     .pipe(include())
     .pipe(
@@ -26,7 +26,7 @@ gulp.task 'compile', ->
   for name in renderers
     gulp.src([
       "javascripts/renderers/#{name}.coffee"
-      "javascripts/renderers/#{name}-vendor.js"
+      "lib/renderers/#{name}.js"
     ])
       .pipe(include())
       .pipe(

@@ -7,6 +7,7 @@ AceVimtura.options =
   autoFocus:      true
 
 AceVimtura.Renderers = {}
+AceVimtura.Renderers.Vendor = {}
 AceVimtura.Views = {}
 
 #=require 'getfile.coffee'
@@ -26,7 +27,7 @@ AceVimtura.init = (id, options = {})->
   @ace.dom = div
   @ace.setKeyboardHandler('ace/keyboard/vim')
   @vimapi = ace.require('ace/keyboard/vim').CodeMirror.Vim
-  this.setRenderer AceVimtura.options.renderer
+  this.setMode('markdown')
   this.preview = new AceVimtura.Preview
   this.setTheme AceVimtura.options.theme
   this._defineCommands()
@@ -34,7 +35,7 @@ AceVimtura.init = (id, options = {})->
   this.ace.focus() if options.autoFocus
 
 AceVimtura.setTheme = (name)->
-  this.Utils.getjs "ace_vimtura/ace/theme-#{name}.js", =>
+  this.Utils.getjs "lib/ace/theme-#{name}.js", =>
     @ace.setTheme("ace/theme/#{name}")
     @themeName = name
 
@@ -51,7 +52,7 @@ AceVimtura.getRenderer = ->
   @rendererName
 
 AceVimtura.setMode = (name)->
-  this.Utils.getjs "ace_vimtura/ace/mode-#{name}.js", =>
+  this.Utils.getjs "lib/ace/mode-#{name}.js", =>
     mode = ace.require("ace/mode/#{name}").Mode
     @ace.session.setMode(new mode)
   @modeName = name
