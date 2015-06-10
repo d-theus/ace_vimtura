@@ -32,14 +32,14 @@ Copy `ace_vimtura` folder to your javascripts folder.
 #### Code
 
 ```html
-<script src="ace_vimtura/ace_vimtura.js" type="text/javascript" charset="utf-8"></script>
+<script src="lib/require.js" type="text/javascript" charset="utf-8"></script>
+<script src="ace_vimtura/main.js" type="text/javascript" charset="utf-8"></script>
 ...
 <div id="editor"></div>
 ```
 
 ```javascript
 AceVimtura.init('editor')
-AceVimtura.setTheme('twilight')
 ```
 
 #### Commands and getting help
@@ -50,13 +50,26 @@ Like in Vim, to enter command set normal mode and hit `:`.
 There will appear little console at the bottom. Type in commands
 here and hit enter. Try `:help` first.
 
-##### map
+##### :map
 Go to normal mode and enter command `:map` and hit enter to
 see key bindings from Vim defaults. See [Vim reference](http://vimdoc.sourceforge.net/htmldoc/usr_toc.html).
 
-##### help
+##### :help
 
 `:help` command will display basic instructions and command list.
+
+##### :set
+
+Set is meant to set variables in Vim. In AceVimtura there are
+several settings you can tune:
+* `theme`
+* `mode`
+* `renderer`
+* `filetype` <=> `renderer` + `mode`
+
+Example:
+
+        :set filetype haml
 
 ## Customize
 
@@ -69,3 +82,14 @@ AceVimtura.vimapi.defineEx(name, shortname, function(cm, params));
 ```
 
 Passed parameters accessible via `params.args`.
+
+### Custom renderers
+
+Renderer can be used as built-in renderers do if it:
+
+* is a class, i.e. can be instantiated with `new`
+* implements `render(text)` method with rendered html being returned
+* resides in `ace_vimtura/renderers` directory
+* class name is capitalized form of file name
+
+Given all requirements are satisfied, you can just `editor.setRenderer('your_renderer_name')`.
