@@ -6,7 +6,12 @@ requirejs.config(
     {
       name: 'ace'
       main: 'ace'
-      location: ""
+      location: "../lib/ace"
+    }
+    {
+      name: 'ace/keyboard/vim'
+      main: 'vim'
+      location: '../lib/ace'
     }
   ]
 )

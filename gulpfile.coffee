@@ -14,7 +14,8 @@ gulp.task 'compile', ->
   gulp.src([
     'lib/ace/ace.js'
     'lib/ace/vim.js'
-    'javascripts/ace_vimtura.coffee'])
+    'javascripts/ace_vimtura.coffee'
+  ])
     .pipe(include())
     .pipe(
       gulpif(/[.]coffee$/, coffee( bare: true )))
@@ -23,6 +24,9 @@ gulp.task 'compile', ->
   renderers = (for name in fs.readdirSync('javascripts/renderers') when name.lastIndexOf('.coffee') > 0
     name.replace('.coffee', '')
   )
+  gulp.src('javascripts/main.coffee')
+    .pipe(coffee bare: true)
+    .pipe(gulp.dest 'ace_vimtura/')
   for name in renderers
     gulp.src([
       "javascripts/renderers/#{name}.coffee"
