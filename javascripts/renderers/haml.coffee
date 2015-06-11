@@ -1,5 +1,5 @@
 define([
-  '../../lib/renderers/haml'
+  'lib/renderers/haml'
 ], (haml)->
   class AceVimtura.Renderers.Haml
     constructor: (options = {})->

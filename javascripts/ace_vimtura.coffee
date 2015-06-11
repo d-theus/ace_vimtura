@@ -1,6 +1,7 @@
 define([
   'ace'
   'ace/keyboard/vim'
+  'style'
 ], ->
   AceVimtura = {}
 
@@ -14,42 +15,44 @@ define([
   AceVimtura.Renderers.Vendor = {}
   AceVimtura.Views = {}
   AceVimtura.Utils = {}
-  require ['utils/getfile'], ->
-    AceVimtura.Utils.getcss('ace_vimtura/ace_vimtura.css')
 
-  #=require 'preview.coffee'
   #=require_tree 'views'
 
   AceVimtura.init = (id, options = {})->
     for key in options
       this.options[key] = options.key
+
     @dom = document.getElementById(id)
     div = document.createElement('div')
     div.classList.add('av_editor')
     div.id = "#{id}_ace"
     @dom.appendChild(div)
+
     @ace = ace.edit(div.id)
     @ace.dom = div
     @ace.setKeyboardHandler('ace/keyboard/vim')
     @vimapi = ace.require('ace/keyboard/vim').CodeMirror.Vim
     this.setFiletype('markdown')
-    this.preview = new AceVimtura.Preview
+    this._initPreview()
     this.setTheme AceVimtura.options.theme
     this._defineCommands()
     this.load() || this.showHelp()
     this.ace.focus() if options.autoFocus
 
+  AceVimtura._initPreview = ->
+    require ['preview'], (pre)=>
+      @preview = new pre
+
   AceVimtura.setTheme = (name)->
-    require ["../lib/ace/theme/#{name}"], =>
+    require ["lib/ace/theme/#{name}"], =>
       @ace.setTheme("ace/theme/#{name}")
       @themeName = name
-
 
   AceVimtura.getTheme = ->
     @themeName
 
   AceVimtura.setRenderer = (name)->
-    require ["renderers/#{name}"], (ren)=>
+    require ["renderers/#{name}", 'preview'], (ren)=>
       @renderer = new ren
       @preview.instantUpdate()
       @rendererName = name

@@ -1,20 +1,20 @@
 requirejs.config(
-  baseUrl: 'ace_vimtura'
+  baseUrl: 'build/javascripts'
   paths:
-    ace_vimtura: './ace_vimtura'
+    ace_vimtura: 'ace_vimtura'
   packages:[
     {
       name: 'ace'
       main: 'ace'
-      location: "../lib/ace"
+      location: "lib/ace"
     }
     {
       name: 'ace/keyboard/vim'
       main: 'vim'
-      location: '../lib/ace'
+      location: 'lib/ace'
     }
   ]
 )
 
-require ['ace_vimtura'], (av)->
+require ['./ace_vimtura'], (av)->
   window.AceVimtura = av if window

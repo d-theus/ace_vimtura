@@ -1,6 +1,6 @@
 var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-define(['../../lib/renderers/markdown'], function(marked) {
+define(['lib/renderers/markdown'], function(marked) {
   return AceVimtura.Renderers.Markdown = (function() {
     function Markdown(options) {
       if (options == null) {

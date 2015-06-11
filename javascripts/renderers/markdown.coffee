@@ -1,5 +1,5 @@
 define([
-  '../../lib/renderers/markdown'
+  'lib/renderers/markdown'
 ], (marked)->
   class AceVimtura.Renderers.Markdown
     constructor: (options = {})->

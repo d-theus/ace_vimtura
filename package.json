@@ -18,9 +18,8 @@
     "coffee-script": "",
     "coffee-gulp": "",
     "gulp-coffee": "",
-    "gulp-include": "",
     "gulp-concat": "",
-    "gulp-less": "",
+    "gulp-copy": "",
     "gulp-uglify": "",
     "gulp-if": "",
     "gulp-rename": ""
