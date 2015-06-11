@@ -21,24 +21,18 @@ gulp.task 'compile', ->
       gulpif(/[.]coffee$/, coffee( bare: true )))
     .pipe(concat 'ace_vimtura.js')
     .pipe(gulp.dest 'ace_vimtura/' )
-  renderers = (for name in fs.readdirSync('javascripts/renderers') when name.lastIndexOf('.coffee') > 0
-    name.replace('.coffee', '')
-  )
   gulp.src('javascripts/main.coffee')
     .pipe(coffee bare: true)
     .pipe(gulp.dest 'ace_vimtura/')
-  for name in renderers
-    gulp.src([
-      "javascripts/renderers/#{name}.coffee"
-      "lib/renderers/#{name}.js"
-    ])
-      .pipe(include())
-      .pipe(
-        gulpif(
-          /[.]coffee$/
-          coffee( bare: true)))
-      .pipe(concat "#{name}.js")
-      .pipe(gulp.dest 'ace_vimtura/renderers')
+  gulp.src('javascripts/utils/**/*.coffee')
+    .pipe(coffee bare: true)
+    .pipe(gulp.dest 'ace_vimtura/utils/')
+  gulp.src([
+    "javascripts/renderers/*.coffee"
+  ])
+    .pipe(include())
+    .pipe(coffee bare: true )
+    .pipe(gulp.dest 'ace_vimtura/renderers')
   gulp.src('stylesheets/**/*.less')
     .pipe(less())
     .pipe(concat 'ace_vimtura.css')

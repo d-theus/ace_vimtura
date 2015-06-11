@@ -13,13 +13,14 @@ define([
   AceVimtura.Renderers = {}
   AceVimtura.Renderers.Vendor = {}
   AceVimtura.Views = {}
+  AceVimtura.Utils = {}
+  require ['utils/getfile'], ->
+    AceVimtura.Utils.getcss('ace_vimtura/ace_vimtura.css')
 
-  #=require 'getfile.coffee'
   #=require 'preview.coffee'
   #=require_tree 'views'
 
   AceVimtura.init = (id, options = {})->
-    this.Utils.getcss('ace_vimtura/ace_vimtura.css')
     for key in options
       this.options[key] = options.key
     @dom = document.getElementById(id)
@@ -31,7 +32,7 @@ define([
     @ace.dom = div
     @ace.setKeyboardHandler('ace/keyboard/vim')
     @vimapi = ace.require('ace/keyboard/vim').CodeMirror.Vim
-    this.setMode('markdown')
+    this.setFiletype('markdown')
     this.preview = new AceVimtura.Preview
     this.setTheme AceVimtura.options.theme
     this._defineCommands()
@@ -39,16 +40,17 @@ define([
     this.ace.focus() if options.autoFocus
 
   AceVimtura.setTheme = (name)->
-    this.Utils.getjs "lib/ace/theme-#{name}.js", =>
+    require ["../lib/ace/theme/#{name}"], =>
       @ace.setTheme("ace/theme/#{name}")
       @themeName = name
+
 
   AceVimtura.getTheme = ->
     @themeName
 
   AceVimtura.setRenderer = (name)->
-    this.Utils.getjs "ace_vimtura/renderers/#{name}.js", =>
-      @renderer = new AceVimtura.Renderers[name.charAt(0).toUpperCase() + name.slice(1)]
+    require ["renderers/#{name}"], (ren)=>
+      @renderer = new ren
       @preview.instantUpdate()
       @rendererName = name
 
@@ -56,9 +58,7 @@ define([
     @rendererName
 
   AceVimtura.setMode = (name)->
-    this.Utils.getjs "lib/ace/mode-#{name}.js", =>
-      mode = ace.require("ace/mode/#{name}").Mode
-      @ace.session.setMode(new mode)
+    @ace.getSession().setMode("ace/mode/#{name}")
     @modeName = name
 
   AceVimtura.getMode = ->
