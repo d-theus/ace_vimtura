@@ -35,11 +35,17 @@ Copy `ace_vimtura` folder to your javascripts folder.
 <script src="lib/require.js" type="text/javascript" charset="utf-8"></script>
 <script src="ace_vimtura/main.js" type="text/javascript" charset="utf-8"></script>
 ...
-<div id="editor"></div>
-```
-
-```javascript
-AceVimtura.init('editor')
+<body>
+  ...
+  <h1>Ace Vimtura Test page</h1>
+    <div id="ace_vimtura" style="height: 500px"></div>
+      <script>
+          require(['ace_vimtura'], function(){
+            editor = AceVimtura.init('ace_vimtura');
+          });
+  </script>
+  ...
+</body>
 ```
 
 #### Commands and getting help
