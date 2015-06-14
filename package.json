@@ -1,7 +1,7 @@
 {
   "name": "ace_vimtura",
   "description": "Ace-based javascript text editor with Vim keybindings and live preview, several markups supported.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "keywords": [
     "vim",
     "ace",
