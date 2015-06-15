@@ -13,10 +13,11 @@ define([
 
   AceVimtura.Renderers = {}
   AceVimtura.Renderers.Vendor = {}
-  AceVimtura.Views = {}
+  AceVimtura.Views = {
+    Help: '<h2>Ace Vimtura</h2><h3>Index</h3><h3>Mappings</h3><p>Type in <code>:map</code> to see mappings.<h3>Commands</h3><p><code>:help</code> show this text </p><p><code>:pre</code> toggle preview mode</p><p><code>:map</code> see key mappings</p><p><code>:w</code> or <code>:write</code> save current text to your browser</p><p><code>:q</code> or <code>:quit</code> close preview and also disable rendering</p><p><code>:set</code> or <code>:se</code> sets variable if value given, shows current value otherwise<h3>Variables</h3><p>theme</p><p>renderer<small>renderer only</small></p><p>filetype <small>changes both renderer and syntax hightlighter</small></p>'
+    Mappings: '<h2>Supported key bindings</h2><h3>Motion:</h3><p>h, j, k, l</p><p> gj, gk </p><p> e, E, w, W, b, B, ge, gE </p><p>f&lt;character&gt;, F&lt;character&gt;, t&lt;character&gt;, T&lt;character&gt; </p><p> $, ^, 0, -, +, _ </p><p> gg, G </p><p> % </p><p> \'&lt;character&gt;, `&lt;character&gt; </p><h3>Operator:</h3><p> d, y, c </p><p> dd, yy, cc </p><p> g~, g~g~ </p><p> &gt;, &lt;, &gt;&gt;, &lt;&lt; </p><h3> Operator-Motion: </h3><p> x, X, D, Y, C, ~ </p><h3> Action: </h3><p> a, i, s, A, I, S, o, O </p><p> zz, z., z&lt;CR&gt;, zt, zb, z- </p><p> J </p><p> u, Ctrl-r </p><p> m&lt;character&gt; </p><p> r&lt;character&gt; </p><h3> Modes: </h3><p> ESC - leave insert mode, visual mode, and clear input state.  </p><p> Ctrl-[, Ctrl-c - same as ESC.</p>'
+  }
   AceVimtura.Utils = {}
-
-  #=require_tree 'views'
 
   AceVimtura.init = (id, options = {})->
     for key in options
@@ -76,14 +77,16 @@ define([
     @filetypeName
 
   AceVimtura.goSplit = ->
-    @ace.dom.classList.remove('fullscreen')
-    @preview.enable()
-    @isSplit = true
+    require ['preview'], ()=>
+      @ace.dom.classList.remove('fullscreen')
+      @preview.enable()
+      @isSplit = true
 
   AceVimtura.goFullscreen = ->
-    @ace.dom.classList.add('fullscreen')
-    @preview.disable()
-    @isSplit = false
+    require ['preview'], ()=>
+      @ace.dom.classList.add('fullscreen')
+      @preview.disable()
+      @isSplit = false
 
   AceVimtura.toggleSplit = ->
     if @isSplit
@@ -91,25 +94,29 @@ define([
     else
       this.goSplit()
 
-  AceVimtura.save = ->
+  AceVimtura.save = (filename = null)->
     ls = window.localStorage
-    ls.ace_vimtura_file = @ace.getValue()
+    filename ||= @filename || 'noname'
+    ls.ace_vimtura_value = @ace.getValue()
+    ls.ace_vimtura_filetype = this.getFiletype()
 
-  AceVimtura.load = ->
+  AceVimtura.load = (filename = null)->
     ls = window.localStorage
-    if data = ls.ace_vimtura_file
-      @ace.setValue(data)
-    else
-      false
+    return false unless ls && (val = ls.ace_vimtura_value)
+    @ace.setValue(val)
+    this.setFiletype(ls.ace_vimtura_filetype)
+    true
+
 
   AceVimtura.showHelp = ->
-      this.save()
+    require ['preview'], ()=>
       this.goSplit()
       this.preview.html(
         this.Views.Help
       )
 
   AceVimtura.showMappings = ->
+    require ['preview'], ()=>
       this.save()
       this.goSplit()
       this.preview.html(

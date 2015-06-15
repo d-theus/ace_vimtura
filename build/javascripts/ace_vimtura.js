@@ -21,7 +21,10 @@ define(['ace', 'ace/keyboard/vim', 'style'], function() {
   };
   AceVimtura.Renderers = {};
   AceVimtura.Renderers.Vendor = {};
-  AceVimtura.Views = {};
+  AceVimtura.Views = {
+    Help: '<h2>Ace Vimtura</h2><h3>Index</h3><h3>Mappings</h3><p>Type in <code>:map</code> to see mappings.<h3>Commands</h3><p><code>:help</code> show this text </p><p><code>:pre</code> toggle preview mode</p><p><code>:map</code> see key mappings</p><p><code>:w</code> or <code>:write</code> save current text to your browser</p><p><code>:q</code> or <code>:quit</code> close preview and also disable rendering</p><p><code>:set</code> or <code>:se</code> sets variable if value given, shows current value otherwise<h3>Variables</h3><p>theme</p><p>renderer<small>renderer only</small></p><p>filetype <small>changes both renderer and syntax hightlighter</small></p>',
+    Mappings: '<h2>Supported key bindings</h2><h3>Motion:</h3><p>h, j, k, l</p><p> gj, gk </p><p> e, E, w, W, b, B, ge, gE </p><p>f&lt;character&gt;, F&lt;character&gt;, t&lt;character&gt;, T&lt;character&gt; </p><p> $, ^, 0, -, +, _ </p><p> gg, G </p><p> % </p><p> \'&lt;character&gt;, `&lt;character&gt; </p><h3>Operator:</h3><p> d, y, c </p><p> dd, yy, cc </p><p> g~, g~g~ </p><p> &gt;, &lt;, &gt;&gt;, &lt;&lt; </p><h3> Operator-Motion: </h3><p> x, X, D, Y, C, ~ </p><h3> Action: </h3><p> a, i, s, A, I, S, o, O </p><p> zz, z., z&lt;CR&gt;, zt, zb, z- </p><p> J </p><p> u, Ctrl-r </p><p> m&lt;character&gt; </p><p> r&lt;character&gt; </p><h3> Modes: </h3><p> ESC - leave insert mode, visual mode, and clear input state.  </p><p> Ctrl-[, Ctrl-c - same as ESC.</p>'
+  };
   AceVimtura.Utils = {};
   AceVimtura.init = function(id, options) {
     var div, i, key, len;
@@ -96,14 +99,22 @@ define(['ace', 'ace/keyboard/vim', 'style'], function() {
     return this.filetypeName;
   };
   AceVimtura.goSplit = function() {
-    this.ace.dom.classList.remove('fullscreen');
-    this.preview.enable();
-    return this.isSplit = true;
+    return require(['preview'], (function(_this) {
+      return function() {
+        _this.ace.dom.classList.remove('fullscreen');
+        _this.preview.enable();
+        return _this.isSplit = true;
+      };
+    })(this));
   };
   AceVimtura.goFullscreen = function() {
-    this.ace.dom.classList.add('fullscreen');
-    this.preview.disable();
-    return this.isSplit = false;
+    return require(['preview'], (function(_this) {
+      return function() {
+        _this.ace.dom.classList.add('fullscreen');
+        _this.preview.disable();
+        return _this.isSplit = false;
+      };
+    })(this));
   };
   AceVimtura.toggleSplit = function() {
     if (this.isSplit) {
@@ -112,29 +123,45 @@ define(['ace', 'ace/keyboard/vim', 'style'], function() {
       return this.goSplit();
     }
   };
-  AceVimtura.save = function() {
+  AceVimtura.save = function(filename) {
     var ls;
+    if (filename == null) {
+      filename = null;
+    }
     ls = window.localStorage;
-    return ls.ace_vimtura_file = this.ace.getValue();
+    filename || (filename = this.filename || 'noname');
+    ls.ace_vimtura_value = this.ace.getValue();
+    return ls.ace_vimtura_filetype = this.getFiletype();
   };
-  AceVimtura.load = function() {
-    var data, ls;
+  AceVimtura.load = function(filename) {
+    var ls, val;
+    if (filename == null) {
+      filename = null;
+    }
     ls = window.localStorage;
-    if (data = ls.ace_vimtura_file) {
-      return this.ace.setValue(data);
-    } else {
+    if (!(ls && (val = ls.ace_vimtura_value))) {
       return false;
     }
+    this.ace.setValue(val);
+    this.setFiletype(ls.ace_vimtura_filetype);
+    return true;
   };
   AceVimtura.showHelp = function() {
-    this.save();
-    this.goSplit();
-    return this.preview.html(this.Views.Help);
+    return require(['preview'], (function(_this) {
+      return function() {
+        _this.goSplit();
+        return _this.preview.html(_this.Views.Help);
+      };
+    })(this));
   };
   AceVimtura.showMappings = function() {
-    this.save();
-    this.goSplit();
-    return this.preview.html(this.Views.Mappings);
+    return require(['preview'], (function(_this) {
+      return function() {
+        _this.save();
+        _this.goSplit();
+        return _this.preview.html(_this.Views.Mappings);
+      };
+    })(this));
   };
   AceVimtura.setVariable = function(variable, value) {
     var methBase;
